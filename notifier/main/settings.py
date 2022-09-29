@@ -26,7 +26,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = os.environ.get('DEBUG', False)
 
 ALLOWED_HOSTS = [os.environ.get('HOST')]
-
+CSRF_TRUSTED_ORIGINS = [f"https://*.{os.environ.get('HOST')}"]
 
 # Application definition
 
@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'users',
     'notifications'
 ]
 
@@ -82,7 +84,7 @@ DATABASES = {
         'USER': os.environ.get('MYSQL_USER'),
         'PASSWORD': os.environ.get('MYSQL_PASSWORD'),
         'HOST': os.environ.get('MYSQL_HOST'),
-        'PORT': '3306'
+        'PORT': os.environ.get('MYSQL_PORT', '3306')
     }
 }
 
@@ -127,3 +129,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+AUTH_USER_MODEL = 'users.User'
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')

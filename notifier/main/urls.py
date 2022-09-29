@@ -23,5 +23,5 @@ prefix = f'api/{__api_version__}'
 urlpatterns = [
     path(f'{prefix}/health-check', lambda _: JsonResponse({'status': 'Ok'})),
     path('admin/', admin.site.urls),
-    path(f'{prefix}/', include('notifications.urls', namespace='notifications'))
+    path(f'{prefix}/notifications/', include('notifications.urls'))
 ]

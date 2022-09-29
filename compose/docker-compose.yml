@@ -33,8 +33,17 @@ services:
       - "3309:3306"
     restart: always
 
+  rabbitmq:
+    image: rabbitmq:3.11-alpine
+    volumes:
+      - ./data/rabbitmq_data:/var/lib/rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+
   api:
     restart: always
+    image: api-image
     build:
       dockerfile: compose/Dockerfile
       context: ./..
@@ -48,3 +57,31 @@ services:
       - env.properties
     depends_on:
       - db
+
+  celery_worker:
+    command: celery -A main worker -l info
+    depends_on:
+      - api
+      - db
+      - rabbitmq
+    hostname: celery_worker
+    image: api-image
+    env_file:
+      - env.properties
+    volumes:
+      - ../notifier:/app
+    restart: always
+
+  celery_beat:
+    command: celery -A main beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    depends_on:
+      - api
+      - db
+      - rabbitmq
+    hostname: celery_beat
+    image: api-image
+    env_file:
+      - env.properties
+    volumes:
+      - ../notifier:/app
+    restart: always
