@@ -1,8 +1,6 @@
 from enum import auto
 
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
-from django.utils.translation import gettext_lazy as _
 from django.db import models
 import pytz
 
@@ -10,9 +8,9 @@ DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
 
 
 class NotificationStatus(models.IntegerChoices):
-    draft = auto()
-    success = auto()
-    error = auto()
+    draft = 1
+    success = 2
+    error = 3
 
 
 class TimeStampMixin(models.Model):
@@ -27,7 +25,7 @@ class BulkNotification(TimeStampMixin):
     message = models.TextField()
     start = models.DateTimeField()
     end = models.DateTimeField()
-    filter = models.JSONField(blank=True, null=True)
+    filter = models.JSONField(blank=True, default={})
 
 
 class Client(TimeStampMixin):
@@ -44,6 +42,6 @@ class Client(TimeStampMixin):
 
 
 class Notification(TimeStampMixin):
-    status = models.CharField(max_length=32, choices=NotificationStatus.choices, default=NotificationStatus.draft)
+    status = models.IntegerField(choices=NotificationStatus.choices, default=NotificationStatus.draft)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     bulk_mail = models.ForeignKey(BulkNotification, on_delete=models.CASCADE)
